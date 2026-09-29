@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Topologische Supraleitung und Majorana-Qubits — Visualisierungen</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <p class="eyebrow">Ergänzendes Material zur Bachelorarbeit</p>
+    <h1>Topologische Supraleitung und Majorana-Qubits</h1>
+    <p class="subtitle">Von der BCS-Theorie zum Tetron-Experiment</p>
+
+    <nav class="tabs" aria-label="Reiter">
+      <a id="link-kitaev" href="#kitaev" role="tab" aria-selected="false">Kitaev-Kette</a>
+      <a id="link-nanodraht" href="#nanodraht" role="tab" aria-selected="false">Rashba-Nanodraht</a>
+      <a id="link-energieskalen" href="#energieskalen" role="tab" aria-selected="false">Energieskalen</a>
+      <a id="link-auslese" href="#auslese" role="tab" aria-selected="false">Auslese</a>
+      <a id="link-gatter" href="#gatter" role="tab" aria-selected="false">Gatter</a>
+      <a id="link-pb-tetron" href="#pb-tetron" role="tab" aria-selected="false">InAs–Pb-Tetron</a>
+    </nav>
+
+    <p class="context-line" id="context-line"></p>
+  </div>
+</header>
+
+<main>
+  <section id="tab-kitaev" class="tab-panel" hidden></section>
+  <section id="tab-nanodraht" class="tab-panel" hidden></section>
+  <section id="tab-energieskalen" class="tab-panel" hidden></section>
+  <section id="tab-auslese" class="tab-panel" hidden></section>
+  <section id="tab-gatter" class="tab-panel" hidden></section>
+  <section id="tab-pb-tetron" class="tab-panel" hidden></section>
+</main>
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    Vorzeichen- und Normierungskonventionen nach Alicea (2012), Abschnitt 2.1
+    und 3.3, wie in der Arbeit übernommen; für Kapitel 5 nach Plugge et al.
+    Welche Einheiten gelten, steht in der Kopfzeile des jeweiligen Reiters.
+    Wo nicht anders angegeben, zeigen die Abbildungen stationäre Zustände;
+    Parameteränderungen sind quasistatisch zu lesen. Echte Zeitabhängigkeit
+    zeigt nur der Reiter Auslese (Verfahren 2); die Wiedergabe im Reiter
+    Gatter ist eine Schrittfolge, keine Zeitentwicklung.
+  </div>
+</footer>
+
+<script src="js/equations.js"></script>
+<script src="js/leitsaetze.js"></script>
+<script src="js/plot.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/demo.js"></script>
+<script src="js/kitaev.js"></script>
+<script src="js/nanowire.js"></script>
+<script src="js/energyscales.js"></script>
+<script src="js/auslese.js"></script>
+<script src="js/gatter.js"></script>
+<script src="js/pbtetron.js"></script>
+<script src="js/demos.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

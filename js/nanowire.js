@@ -850,7 +850,7 @@ var MV = window.MV || (window.MV = {});
     model:
       '<p>Projektion des Singulett-Paarungsterms aus Gl. ' + MV.eq('wire.model') + ' auf das untere Band. ' +
       'Der Spinor dieses Bandes zeigt entlang −d̂(k) mit</p>' +
-      '<span class="eq">d(k) = ( 0, −α k, E_Z )</span>' +
+      '<span class="eq">d(k) = ( 0, α k, E_Z )</span>' +
       '<p>und dreht sich damit stetig mit k: bei k = 0 steht er entlang −ẑ, für große ' +
       '|k| kippt er in ∓ŷ-Richtung. Genau diese Drehung macht die Singulett-Paarung ' +
       'im helikalen Regime brauchbar.</p>',
@@ -909,8 +909,8 @@ var MV = window.MV || (window.MV = {});
       '<p>' + UNITS + '</p>' +
       '<p>Δ ist in Kapitel 4 proximity-induziert und extern vorgegeben, nicht ' +
       'selbstkonsistent bestimmt.</p>' +
-      '<p>Beachte das Minuszeichen in d(k) = (0, −αk, E_Z): der Spinor des unteren ' +
-      'Bandes zeigt entlang −d̂(k).</p>' +
+      '<p>Vorzeichen: Mit ψ ∼ e^{ikx} wird −iασ_y∂ₓ zu +αk σ_y, also d(k) = (0, αk, E_Z); ' +
+      'der Spinor des unteren Bandes zeigt entlang −d̂(k), für k → +∞ also nach −ŷ.</p>' +
       '<p>' + PHI_NOTE + '</p>',
     reference:
       '<p>' + MV.sec('4.2') + ' der Arbeit, Gl. ' + MV.eq('wire.deltaEff') + '.</p>',

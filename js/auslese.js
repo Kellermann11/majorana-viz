@@ -1018,9 +1018,22 @@ var MV = window.MV || (window.MV = {});
     var tp = tz(+1), tm = tz(-1);
     var R = Math.max(state.t0 + state.t1, 1) * 1.25;
 
+    /* Gleicher Maßstab auf beiden Achsen, damit Längen und Winkel der Zeiger
+       stimmen. Der Ausschnitt enthält immer alle Spitzen, auch wenn t₁ > t₀
+       ist und t₋ in die linke Halbebene zeigt; reicht die Höhe nicht, wird
+       die Breite passend mitvergrößert. */
     var m = p.measure();
-    var xLo = -0.18 * R, xHi = R * 1.08;
-    var Yh = (xHi - xLo) * m.ph / m.pw;
+    var ratio = m.ph / m.pw;
+    var xs = [0, state.t0, tp.re, tm.re];
+    var pad = 0.12 * R;
+    var xLo = Math.min(-0.18 * R, Math.min.apply(null, xs) - pad);
+    var xHi = Math.max(R * 1.08, Math.max.apply(null, xs) + pad);
+    var yNeed = 2 * (Math.max(Math.abs(tp.im), Math.abs(tm.im)) + pad);
+    var Yh = (xHi - xLo) * ratio;
+    if (Yh < yNeed) {
+      var cx = (xLo + xHi) / 2, W = yNeed / ratio;
+      xLo = cx - W / 2; xHi = cx + W / 2; Yh = yNeed;
+    }
 
     p.begin({ x: [xLo, xHi], y: [-Yh / 2, Yh / 2],
               xLabel: 'Re t', yLabel: 'Im t', xTickCount: 5, yTickCount: 5 });
@@ -1595,7 +1608,7 @@ var MV = window.MV || (window.MV = {});
         lead: 'Die Gesamtamplitude t_z = t₀ + t₁z als Zeiger; <b>z ist der ' +
               'Eigenwert der in Panel A gewählten Achse</b>. Nur die Differenz ' +
               '|t₊|² − |t₋|² trägt den Qubit-Zustand.',
-        aspect: 0.72,
+        wide: true, aspect: 0.42,
         info: INFO_B
       });
 

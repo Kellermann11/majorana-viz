@@ -409,7 +409,7 @@ var MV = window.MV || (window.MV = {});
   var KET_1 = regOf([[0, 0], [1, 0]]);
   var KET_M = regOf([[S2, 0], [S2 * Math.cos(PI / 4), S2 * Math.sin(PI / 4)]]);
 
-  /** Ĉ aus CLAUDE.md §8: ½(1+ẑ)_C ⊗ 1_T + ½(1−ẑ)_C ⊗ x̂_T. */
+  /** Ĉ aus CLAUDE.md §8: ½(1+ẑ)_C ⊗ 1_D + ½(1−ẑ)_C ⊗ x̂_D (Ziel hier D statt T). */
   function cnotOn(v, ctrl, targ) {
     var pPlus = project(v, [[ctrl, 'z']], +1).vec;
     var pMinus = project(v, [[ctrl, 'z']], -1).vec;
@@ -488,10 +488,10 @@ var MV = window.MV || (window.MV = {});
     {
       key: 'CNOT',
       name: 'CNOT',
-      title: 'CNOT — Kontrolle C, Ziel T',
-      roles: ['C', 'A', 'T'],
+      title: 'CNOT — Kontrolle C, Ziel D',
+      roles: ['C', 'A', 'D'],
       out: [0, 2],
-      outName: 'C und T',
+      outName: 'C und D',
       inQubits: 2,
       source: MV.secOfWork('5.5') + '; Plugge et al., Fig. 5(a)',
       prepText: 'Präpariere die Ancilla A in |0⟩.',
@@ -500,16 +500,16 @@ var MV = window.MV || (window.MV = {});
         return tensor(tensor(regOf(psi), KET_0), t0 ? KET_1 : KET_0);
       },
       steps: [
-        { text: 'Miss die gemeinsame Parität x̂_A x̂_T.', terms: [[1, 'x'], [2, 'x']], sym: 'a₁' },
+        { text: 'Miss die gemeinsame Parität x̂_A x̂_D.', terms: [[1, 'x'], [2, 'x']], sym: 'a₁' },
         { text: 'Miss die gemeinsame Parität ẑ_C ẑ_A.', terms: [[0, 'z'], [1, 'z']], sym: 'a₂' },
         { text: 'Lies x̂_A aus.', terms: [[1, 'x']], sym: 'a₃' }
       ],
-      corrText: 'Wende ẑ_C an, falls a₁a₃ = −1, und x̂_T, falls a₂ = −1.',
+      corrText: 'Wende ẑ_C an, falls a₁a₃ = −1, und x̂_D, falls a₂ = −1.',
       noCorrCond: 'a₁a₃ = +1 und a₂ = +1',
       correct: function (v, r) {
         var list = [];
         if (r[0] * r[2] === -1) list.push({ name: 'ẑ_C', qubit: 0, U: SZ });
-        if (r[1] === -1) list.push({ name: 'x̂_T', qubit: 2, U: SX });
+        if (r[1] === -1) list.push({ name: 'x̂_D', qubit: 2, U: SX });
         return applyOps(v, list);
       },
       corrJoin: function (names) { return names.join(' und '); },
@@ -521,7 +521,7 @@ var MV = window.MV || (window.MV = {});
       key: 'T',
       name: 'T-Gatter',
       title: 'T-Gatter über einen magischen Zustand',
-      roles: ['D', 'M'],
+      roles: ['Q', 'M'],
       out: [1],
       outName: 'M',
       inQubits: 1,
@@ -533,8 +533,8 @@ var MV = window.MV || (window.MV = {});
       prepShort: '|M⟩_M',
       prep: function (psi) { return tensor(regOf(psi), KET_M); },
       steps: [
-        { text: 'Miss die gemeinsame Parität ẑ_D ẑ_M.', terms: [[0, 'z'], [1, 'z']], sym: 's' },
-        { text: 'Lies x̂_D aus.', terms: [[0, 'x']], sym: 'x' }
+        { text: 'Miss die gemeinsame Parität ẑ_Q ẑ_M.', terms: [[0, 'z'], [1, 'z']], sym: 's' },
+        { text: 'Lies x̂_Q aus.', terms: [[0, 'x']], sym: 'x' }
       ],
       corrText: 'Auf M: x̂ falls s = −1, danach ẑ falls x = −1, danach Ŝ_z falls s = −1.',
       noCorrCond: 's = +1 und x = +1',
@@ -1399,12 +1399,12 @@ var MV = window.MV || (window.MV = {});
   var AX_SYM = { x: 'x̂', y: 'ŷ', z: 'ẑ' };
 
   /**
-   * Das Zielqubit des CNOT heißt in der Arbeit (§5.5) und bei Plugge „T" — und
-   * kollidiert damit mit dem T-Gatter im selben Abschnitt. Umbenannt wird es
-   * nicht, die Seite folgt der Arbeit; überall, wo es auftaucht, steht aber
-   * „T (Ziel)". Das Gatter heißt stets „T-Gatter".
+   * Das Zielqubit des CNOT heißt bei Plugge „T" und kollidierte damit mit dem
+   * T-Gatter. Die Arbeit (§5.5, mit Fußnote) nennt es deshalb „D", die Seite
+   * folgt ihr. Das Datenqubit des T-Gatter-Protokolls heißt „Q", damit D
+   * eindeutig bleibt. Überall, wo das Zielqubit auftaucht, steht „D (Ziel)".
    */
-  function roleLabel(role) { return role === 'T' ? 'T (Ziel)' : role; }
+  function roleLabel(role) { return role === 'D' ? 'D (Ziel)' : role; }
 
   /* Zeitaufteilung innerhalb eines Messschritts (CLAUDE.md §8, Richtwert) */
   var U_RESULT = 1 / 3;     /* ab hier steht das Ergebnis da                 */
@@ -1782,8 +1782,8 @@ var MV = window.MV || (window.MV = {});
     var atEnd = step >= lastStep(run, proto) && play.u >= 1;
 
     readoutB.set('proto', proto.name);
-    readoutB.set('out', 'Qubit ' + (proto.outName === 'C und T'
-      ? 'C und T (Ziel)' : roleLabel(proto.outName)));
+    readoutB.set('out', 'Qubit ' + (proto.outName === 'C und D'
+      ? 'C und D (Ziel)' : roleLabel(proto.outName)));
 
     var shown = run.results.filter(function (b, i) {
       return step > i + 1 || (step === i + 1 && u >= U_RESULT);
@@ -1798,7 +1798,7 @@ var MV = window.MV || (window.MV = {});
        etwas zu tun war. Die Liste liefert correct()/applyOps ohnehin. */
     readoutB.set('corr', !state.correct ? 'weggelassen'
       : !atEnd ? 'an'
-      : 'an — angewandt: ' + (run.applied || 'keine'));
+      : 'an — angewandt: ' + (run.applied || 'keine, in diesem Zweig nicht nötig'));
 
     if (!atEnd) {
       readoutB.status('trivial', 'Lauf noch nicht zu Ende — die Abweichung steht am Schluss');
@@ -2199,7 +2199,7 @@ var MV = window.MV || (window.MV = {});
         proto.roles.map(roleLabel).join(', ') + '</li>' +
         '<li>Eingangszustand: θ = ' + MV.fmt(state.theta, 0) + '°, φ = ' +
         MV.fmt(state.phi, 0) + '°' +
-        (proto.inQubits === 2 ? ', Qubit T (Ziel) in |' + (state.target1 ? 1 : 0) + '⟩' : '') +
+        (proto.inQubits === 2 ? ', Qubit D (Ziel) in |' + (state.target1 ? 1 : 0) + '⟩' : '') +
         '</li>' +
         '<li>Messergebnisse: ' + (run.results.filter(function (b, i) {
           return state.step > i + 1 || (state.step === i + 1 && drawU() >= U_RESULT);
@@ -2207,7 +2207,9 @@ var MV = window.MV || (window.MV = {});
           return proto.steps[i].sym + ' = ' + MV.fmtSigned(b, 0) +
             ' (' + (run.drawn[i] ? 'gezogen' : 'von Hand') + ')';
         }).join(', ') || '—') + '</li>' +
-        '<li>Korrektur: ' + (state.correct ? 'an' : 'weggelassen') + '</li>' +
+        '<li>Korrektur: ' + (!state.correct ? 'weggelassen'
+          : !atEnd ? 'an'
+          : 'an — angewandt: ' + (run.applied || 'keine, in diesem Zweig nicht nötig')) + '</li>' +
         '<li>angezeigter Schritt: ' + state.step + ' von ' +
         lastStep(run, proto) + (play.running ? ', läuft' : ', angehalten') + '</li>' +
         '<li>Anzeigetempo: ' + MV.fmt(play.tempo, 1) + ' s je Schritt — ' +
@@ -2457,13 +2459,13 @@ var MV = window.MV || (window.MV = {});
       panelB.controls.appendChild(MV.ui.el('p', {
         class: 'note',
         html: 'Beim CNOT ist der Eingang zweifach: Qubit C trägt den Zustand aus ' +
-              'θ und φ, Qubit T startet in |0⟩ oder |1⟩. Mit C auf x̂ = +1 und ' +
-              'T in |0⟩ entsteht ein Bell-Zustand — beide Bloch-Vektoren ' +
+              'θ und φ, Qubit D startet in |0⟩ oder |1⟩. Mit C auf x̂ = +1 und ' +
+              'D in |0⟩ entsteht ein Bell-Zustand — beide Bloch-Vektoren ' +
               'schrumpfen dann auf null.'
       }));
 
       targetButtons = MV.ui.buttonRow(panelB.controls, {
-        label: 'Qubit T (Ziel) — nur CNOT:',
+        label: 'Qubit D (Ziel) — nur CNOT:',
         buttons: [
           { text: '|0⟩', pressed: true, onClick: function () { setTarget(false); } },
           { text: '|1⟩', pressed: false, onClick: function () { setTarget(true); } }

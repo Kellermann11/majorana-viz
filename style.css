@@ -1082,3 +1082,5 @@ footer.site-footer {
   font-variant-numeric: tabular-nums;
   color: var(--muted);
 }
+
+.site-footer__credit { margin: 8px 0 0; }

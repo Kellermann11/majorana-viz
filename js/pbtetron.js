@@ -535,7 +535,7 @@ var MV = window.MV || (window.MV = {});
     p.arrow(L + 0.55, 0, -14, 0, { color: MV.palette.curve2, head: 5 });
     p.marker(L + 1.2, 0, { r: 6, color: MV.palette.curve2, shape: 'square',
       legend: 'QD4 — Injektor, ' + MV.fmt(READOUT.inject, 1) +
-              ' kHz, nicht Teil der Schleife' });
+              ' kHz; injiziert ein Elektron in die Z-Messschleife, ist selbst nicht Teil der Schleife' });
     p.label('QD4', p.X(L + 1.2), p.Y(0) - 12, {
       color: MV.palette.curve2, align: 'center', baseline: 'bottom', font: '12px system-ui'
     });

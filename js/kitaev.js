@@ -436,7 +436,8 @@ var MV = window.MV || (window.MV = {});
     return '<p>μ = <span class="num">' + MV.fmt(state.mu, 2) + '</span>, ' +
       't = <span class="num">' + MV.fmt(state.t, 2) + '</span>, ' +
       'Δ = <span class="num">' + MV.fmt(state.delta, 2) + '</span>, ' +
-      'φ = 0 (fest). Alle Größen dimensionslos in Einheiten von t.</p>' +
+      'φ = 0 (fest). Alle Größen in einer festen Energieeinheit; bei t = 1 entsprechen ' +
+      'sie den Achsen μ/t und E/t in ' + MV.figShort('kitaev.spectrumFig') + ' der Arbeit.</p>' +
       '<p>Daraus: ε₀ = <span class="num">' + MV.fmtSigned(d.eps0, 2) + '</span>, ' +
       'ε_π = <span class="num">' + MV.fmtSigned(d.epsPi, 2) + '</span>, ' +
       's₀ = <span class="num">' + signLabel(d.s0) + '</span>, ' +

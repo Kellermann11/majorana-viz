@@ -279,21 +279,43 @@ var MV = window.MV || (window.MV = {});
        garantiert keine lange Lebensdauer — und umgekehrt kann die Lebensdauer
        lang sein, ohne dass die Ladungsenergie überhaupt schützt. Der Leitsatz
        ist der zweite Satz; zu sehen ist die Aussage erst, wenn beide Fälle
-       nacheinander vorkommen. Teil a zeigt den ersten, Teil b den zweiten.
+       nacheinander vorkommen.
+
+       Die Vorführung ändert dabei immer nur eine Größe: 0) schwebend mit
+       langer Lebensdauer, K3 und K4 erfüllt; a) schwebend, T_P fällt — K3
+       bleibt erfüllt, K4 nicht; b) T_P wieder auf den Ausgangswert, dann
+       geerdet — K3 entfällt, K4 bleibt erfüllt. Geerdet wird bewusst bei
+       derselben Lebensdauer wie in Schritt 0, damit nicht der Eindruck
+       entsteht, das Erden verlängere T_P: Nach §5.1 fügt die schwebende Insel
+       eine Barriere hinzu, und nach §6.5 erwarten die Autoren an schwebenden
+       Tetronen eher längere Lebensdauern.
 
        Dass T_P dabei bis in den Mikrosekundenbereich läuft, ist eine Eingabe
        und keine Behauptung über einen Mechanismus: welcher Vorgang eine kurze
        Lebensdauer verursacht, sagt dieser Reiter nicht. */
+    var teil0 = null;        /* Ausgangslage der Vorführung zu 5.6 */
+
     MV.demo.register('energieskalen.B', {
       prepare: function () {
         e = handle('energieskalen');
         e.defaults();
         e.markCriteria(['K3', 'K4']);
         k4Before = e.ratiosNow().K4;
+        teil0 = null;
         teilA = null;
       },
       steps: [
         { wait: LEAD },
+        /* ---- 0) schwebend, T_P lang: K3 und K4 erfüllt ---- */
+        { set: function () {
+            teil0 = {
+              floating: e.get('floating'),
+              K3: e.criteriaVerdict('K3'),
+              K4: e.criteriaVerdict('K4'),
+              TP: e.get('TP')
+            };
+          } },
+        { wait: HOLD },
         /* ---- a) schwebend: Ladungsschutz da, Parität kurzlebig ---- */
         decades(1, 1e-7, 3000),
         { set: function () {
@@ -306,7 +328,8 @@ var MV = window.MV || (window.MV = {});
             };
           } },
         { wait: HOLD },
-        /* ---- b) geerdet: kein Ladungsschutz, Parität langlebig ---- */
+        /* ---- b) T_P zurück auf den Ausgangswert, dann geerdet:
+                kein Ladungsschutz, Parität bei gleichem T_P langlebig ---- */
         decades(1e-7, 1, 800),
         { set: function () { e.holdK3(true); e.showPanel('A'); } },
         { wait: 500 },
@@ -315,8 +338,6 @@ var MV = window.MV || (window.MV = {});
         { set: function () { e.showPanel('B'); } },
         { wait: 1000 },
         { set: function () { e.holdK3(false); } },
-        { wait: 600 },
-        decades(1, 10, 2000),
         { wait: HOLD }
       ],
       check: function () {
@@ -328,26 +349,36 @@ var MV = window.MV || (window.MV = {});
            wie im Reiter, hier nur zur Gegenprobe. */
         var expected = (tau * 1e-6) / tp;
 
+        var nullOk = teil0 !== null &&
+                     teil0.floating === true &&
+                     teil0.K3 === 'erfüllt' &&
+                     teil0.K4 === 'erfüllt';
         var aOk = teilA !== null &&
                   teilA.floating === true &&
                   teilA.K3 === 'erfüllt' &&
                   teilA.K4 === 'nicht erfüllt';
+        /* Geerdet bei derselben Lebensdauer wie in Schritt 0: K4 ist
+           unverändert, nur K3 ist weggefallen. */
         var bOk = e.get('floating') === false &&
                   shown.indexOf('K3') < 0 && r.K3 === null &&
                   shown.indexOf('K4') >= 0 &&
                   e.criteriaVerdict('K4') === 'erfüllt' &&
                   marked.indexOf('K4') >= 0 &&
-                  Math.abs(tp - 10) < 1e-9 &&
+                  teil0 !== null && Math.abs(tp - teil0.TP) < 1e-9 &&
                   Math.abs(r.K4 - expected) < 1e-18 &&
-                  k4Before !== null && r.K4 < k4Before;
+                  k4Before !== null &&
+                  Math.abs(r.K4 - k4Before) <= 1e-9 * k4Before;
 
         return {
-          ok: aOk && bOk,
-          text: 'Schwebend mit T_P = ' + (teilA ? e.fmtTP(teilA.TP) : '—') +
+          ok: nullOk && aOk && bOk,
+          text: 'Schwebend mit T_P = ' + (teil0 ? e.fmtTP(teil0.TP) : '—') +
+                ': K3 und K4 erfüllt. Schwebend mit T_P = ' +
+                (teilA ? e.fmtTP(teilA.TP) : '—') +
                 ': Ladungsschutz vorhanden, K4 verletzt (τ_meas/T_P = ' +
-                (teilA ? MV.fmt(teilA.ratio, 1) : '—') + '). Geerdet mit T_P = ' +
-                e.fmtTP(tp) + ': kein Ladungsschutz, K4 erfüllt (' +
-                MV.fmtExp(r.K4, 2) + '). K3 und K4 sind unabhängig.'
+                (teilA ? MV.fmt(teilA.ratio, 1) : '—') + '). Geerdet mit ' +
+                'demselben T_P = ' + e.fmtTP(tp) + ': kein Ladungsschutz, ' +
+                'K4 weiterhin erfüllt (' + MV.fmtExp(r.K4, 2) + '). ' +
+                'K3 und K4 sind unabhängig.'
         };
       }
     });
